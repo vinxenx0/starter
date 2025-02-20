@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="display-4">Bienvenido a Flask MVC</h1>
+    <p class="lead">Sistema de autenticación con Flask.</p>
+    {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Iniciar Sesión</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-success">Registrarse</a>
+    {% else %}
+        <a href="{{ url_for('users.dashboard') }}" class="btn btn-primary">Panel de Administración</a>
+    {% endif %}
+</div>
+{% endblock %}

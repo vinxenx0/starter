@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Añadir Usuario{% endblock %}
+
+{% block content %}
+<h2>Añadir Nuevo Usuario</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="username" class="form-label">Usuario</label>
+        <input type="text" class="form-control" name="username" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" name="password" required>
+    </div>
+    <div class="mb-3">
+        <label for="role" class="form-label">Rol</label>
+        <select name="role" class="form-select">
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Editar Usuario{% endblock %}
+
+{% block content %}
+<h2>Editar Usuario</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="username" class="form-label">Usuario</label>
+        <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Nueva Contraseña (opcional)</label>
+        <input type="password" class="form-control" name="password">
+    </div>
+    {% if current_user.is_admin %}
+    <div class="mb-3">
+        <label for="role" class="form-label">Rol</label>
+        <select name="role" class="form-select">
+            <option value="user" {% if user.role == 'user' %}selected{% endif %}>Usuario</option>
+            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Administrador</option>
+        </select>
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+</form>
+{% endblock %}
