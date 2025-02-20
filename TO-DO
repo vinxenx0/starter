@@ -1,0 +1,5 @@
+. no se graba el usuario cuando lo creo como admin, el formulario no da mas información, en cambio cuanado me registro si funciona
+. no puedo editar mis datos de mi perfil no me graba los cambios, ni me da mas información
+. no pueod añadir nuvos usuarios como admin (pt1)
+
+. revisar los test py

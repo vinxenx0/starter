@@ -1,11 +1,14 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, render_template, redirect, url_for
+from flask_login import current_user, login_required
 from app.controllers.user import UserController
 
 bp = Blueprint("users", __name__)
 
 @bp.route("/")
 def index():
-    return UserController.dashboard()
+    if current_user.is_authenticated:
+        return redirect(url_for("users.dashboard"))
+    return render_template("index.html")
 
 @bp.route("/dashboard")
 def dashboard():
