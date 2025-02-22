@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
 from werkzeug.security import generate_password_hash
 from app import db
@@ -11,30 +11,21 @@ class UserController:
     def dashboard():
         if current_user.is_admin():
             users = User.query.all()
-            flash("Bienvenido al panel de administración. Aquí puedes gestionar los usuarios.", "info")
             return render_template("dashboard.html", users=users)
         else:
-            flash("Bienvenido a tu perfil. Aquí puedes ver y actualizar tu información.", "info")
             return render_template("profile.html", user=current_user)
 
     @staticmethod
     @login_required
     def add_user():
         if not current_user.is_admin():
-            flash("❌ Acceso denegado: No tienes permisos para añadir usuarios.", "danger")
+            flash("Acceso denegado", "danger")
             return redirect(url_for("users.dashboard"))
 
         form = UserForm()
-
         if form.validate_on_submit():
-            print("✅ Formulario validado correctamente")  # Depuración
-
             if User.query.filter_by(username=form.username.data).first():
-                flash(f"⚠️ El usuario '{form.username.data}' ya existe.", "warning")
-                return redirect(url_for("users.add_user"))
-
-            if not form.password.data:
-                flash("⚠️ La contraseña es obligatoria.", "warning")
+                flash("El usuario ya existe.", "warning")
                 return redirect(url_for("users.add_user"))
 
             hashed_password = generate_password_hash(form.password.data)
@@ -42,44 +33,40 @@ class UserController:
             db.session.add(new_user)
             db.session.commit()
 
-            flash(f"✅ Usuario '{new_user.username}' creado con éxito.", "success")
+            flash("Usuario creado con éxito.", "success")
             return redirect(url_for("users.dashboard"))
 
-        flash("📝 Rellena el formulario correctamente.", "info")
         return render_template("add_user.html", form=form)
 
     @staticmethod
     @login_required
     def edit_user(user_id):
         user = User.query.get(user_id)
-
         if not user:
-            flash("⚠️ Error: Usuario no encontrado en la base de datos.", "danger")
+            flash("Usuario no encontrado.", "danger")
             return redirect(url_for("users.dashboard"))
 
         if not current_user.is_admin() and current_user.id != user.id:
-            flash("🚫 No tienes permiso para editar este perfil.", "danger")
+            flash("No tienes permiso para editar este perfil.", "danger")
             return redirect(url_for("users.dashboard"))
 
-        form = UserForm(obj=user)
+        form = UserForm(user_id=user.id, obj=user)  # ✅ PASAMOS EL user_id
 
         if form.validate_on_submit():
             if form.username.data != user.username and User.query.filter_by(username=form.username.data).first():
-                flash(f"⚠️ El nombre de usuario '{form.username.data}' ya está en uso. Intenta con otro.", "warning")
+                flash("El nombre de usuario ya está en uso.", "warning")
                 return redirect(url_for("users.edit_user", user_id=user.id))
 
             user.username = form.username.data
             if form.password.data:
                 user.password = generate_password_hash(form.password.data)
-                flash("🔐 Se ha actualizado la contraseña correctamente.", "info")
             if current_user.is_admin():
                 user.role = form.role.data
 
             db.session.commit()
-            flash(f"✅ Perfil de '{user.username}' actualizado con éxito.", "success")
+            flash("Usuario actualizado con éxito.", "success")
             return redirect(url_for("users.dashboard") if current_user.is_admin() else url_for("users.dashboard"))
 
-        flash("✏️ Modifica los datos y guarda los cambios.", "info")
         return render_template("edit_user.html", form=form, user=user)
 
     @staticmethod
